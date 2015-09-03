@@ -20,6 +20,18 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
+    // MARK: - IBOutlet Properties
+    
+    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var intensitySlider: UISlider!
+    
+    // MARK: - IBAction Properties
+    
+    @IBAction func changeFilterButtonAction(sender: UIButton) {
+    }
+    @IBAction func saveImageButtonAction(sender: UIButton) {
+    }
+    @IBAction func changeIntensitySliderAction(sender: UISlider) {
+    }
 }
 
