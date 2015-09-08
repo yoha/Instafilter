@@ -13,6 +13,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.title = "Instafilter"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "importPicture")
         self.coreImageContext = CIContext(options: nil)
         self.coreImageFilter = CIFilter(name: "CISepiaTone")
@@ -37,6 +38,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     // MARK: - IBAction Properties
     
     @IBAction func changeFilterButtonAction(sender: UIButton) {
+        let alertController = UIAlertController(title: "Choose filter", message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
+        alertController.addAction(UIAlertAction(title: "CIBumpDistortion", style: UIAlertActionStyle.Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "CIGaussianBlur", style: .Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "CIPixellate", style: .Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "CISepiaTone", style: .Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "CITwirlDistortion", style: .Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "CIUnsharpMask", style: .Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "CIVignette", style: .Default, handler: setFilter))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        self.presentViewController(alertController, animated: true, completion: nil)
     }
     @IBAction func saveImageButtonAction(sender: UIButton) {
     }
@@ -82,13 +93,31 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func applyFilterProcessing() {
-        self.coreImageFilter.setValue(self.intensitySlider.value, forKey: kCIInputIntensityKey)
+        let acceptableFilterParams = self.coreImageFilter.inputKeys
+        if acceptableFilterParams.contains(kCIInputIntensityKey) {
+            self.coreImageFilter.setValue(self.intensitySlider.value, forKey: kCIInputIntensityKey)
+        }
+        if acceptableFilterParams.contains(kCIInputRadiusKey) {
+            self.coreImageFilter.setValue(self.intensitySlider.value * 200, forKey: kCIInputRadiusKey)
+        }
+        if acceptableFilterParams.contains(kCIInputScaleKey) {
+            self.coreImageFilter.setValue(self.intensitySlider.value * 10, forKey: kCIInputScaleKey)
+        }
+        if acceptableFilterParams.contains(kCIInputCenterKey) {
+            self.coreImageFilter.setValue(CIVector(x: self.currentImage.size.width / 2, y: self.currentImage.size.height / 2), forKey: kCIInputCenterKey)
+        }
         
         let cgImage = self.coreImageContext.createCGImage(self.coreImageFilter.outputImage, fromRect: self.coreImageFilter.outputImage.extent)
         let processedImage = UIImage(CGImage: cgImage)
         
-        self.imageView.image = processedimage
+        self.imageView.image = processedImage
         
     }
+    
+    func setFilter(action: UIAlertAction) {
+        self.coreImageFilter = CIFilter(name: action.title!)
+        let imageToBeFiltered = CIImage(image: self.currentImage)
+        self.coreImageFilter.setValue(imageToBeFiltered, forKey: kCIInputImageKey)
+        self.applyFilterProcessing()
+    }
 }
-
