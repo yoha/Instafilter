@@ -50,6 +50,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         self.presentViewController(alertController, animated: true, completion: nil)
     }
     @IBAction func saveImageButtonAction(sender: UIButton) {
+        UIImageWriteToSavedPhotosAlbum(self.imageView.image!, self, "image:didFinishSavingWithError:contextInfo:", nil)
     }
     @IBAction func changeIntensitySliderAction(sender: UISlider) {
         self.applyFilterProcessing()
@@ -112,6 +113,19 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         self.imageView.image = processedImage
         
+    }
+    
+    func image(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafePointer<Void>) {
+        if error == nil {
+            let alertController = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: UIAlertControllerStyle.Alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        }
+        else {
+            let alertController = UIAlertController(title: "Save error!", message: error?.localizedDescription, preferredStyle: .Alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+            self.presentViewController(alertController, animated: true, completion: nil)
+        }
     }
     
     func setFilter(action: UIAlertAction) {
